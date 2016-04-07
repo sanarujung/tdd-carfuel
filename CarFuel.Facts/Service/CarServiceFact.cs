@@ -9,6 +9,7 @@ using CarFuel.Service;
 using Xunit;
 using Should;
 using Xunit.Abstractions;
+using Moq;
 
 namespace CarFuel.Facts.Services
 {
@@ -16,10 +17,12 @@ namespace CarFuel.Facts.Services
     {
         public class SharedService
         {
-            public CarService carservice { get; set; }
+            public CarService CarService { get; set; }
+            public FakeCarDb Db { get; set; }
             public SharedService()
             {
-                carservice = new CarService(new FakeCarDb());
+                Db = new FakeCarDb();
+                CarService = new CarService(Db);
             }
         }
 
@@ -34,15 +37,16 @@ namespace CarFuel.Facts.Services
         {
             //private ICarDb db;
             private CarService s;
+            private FakeCarDb db;
             private ITestOutputHelper output;
 
-            public AddCarMethod(ITestOutputHelper output,SharedService service)
+            public AddCarMethod(ITestOutputHelper output, SharedService service)
             {
                 //db = new FakeCarDb();
                 //s = new CarService(db);
                 this.output = output;
-                s = service.carservice;
-
+                s = service.CarService;
+                db = service.Db;
                 output.WriteLine("ctor");
             }
 
@@ -50,6 +54,14 @@ namespace CarFuel.Facts.Services
             [Fact]
             public void AddSingleCar()
             {
+                var mock = new Mock<ICarDb>();
+
+                mock.Setup(db => db.Add(It.IsAny<Car>())).Returns((Car car) => car);
+
+                var service = new CarService(mock.Object);
+
+
+
                 //var db = new FakeCarDb();      /ไม่ต้องมีแล้วเพราะสร้าง contructor แล้ว set default ไว้ แต่ 2 function จะมองว่า คนละตัวแปร function 2 ตัวเรียกใช้ db,s 2 ครั้ง จะมองว่าเป็นตัวแปรคนละตัว
                 //var s = new CarService(db);
                 var c = new Car();
@@ -57,17 +69,22 @@ namespace CarFuel.Facts.Services
                 c.Model = "Civic";
                 var userId = Guid.NewGuid();
 
-                var c2 = s.AddCar(c, userId);
-                Console.WriteLine("test output");
+                //db.AddMethodHasCalled = false;
+
+                var c2 = service.AddCar(c, userId);
+                //Console.WriteLine("test output");
 
                 Assert.NotNull(c2);
                 Assert.Equal(c2.Make, c.Make);
                 Assert.Equal(c2.Model, c.Model);
 
-                var cars = s.GetCarsByMember(userId);
+                mock.Verify(db => db.Add(It.IsAny<Car>()), Times.Once);  // check ว่าตัว moq ที่ทำถูกเรียก 1 ครั้ง
 
-                Assert.Equal(1, cars.Count());
-                Assert.Contains(cars, x => x.OwnerId == userId);
+                //Assert.True(db.AddMethodHasCalled);
+                //var cars = s.GetCarsByMember(userId);
+
+                //Assert.Equal(1, cars.Count());
+                //Assert.Contains(cars, x => x.OwnerId == userId);
             }
 
             [Fact]
@@ -104,7 +121,7 @@ namespace CarFuel.Facts.Services
             {
                 //db = new FakeCarDb();
                 //s = new CarService(db);
-                s = service.carservice;
+                s = service.CarService;
             }
             [Fact]
             public void MemberCanGetOnlyHisorHerOwnCar()
@@ -132,7 +149,7 @@ namespace CarFuel.Facts.Services
             private CarService s;
             public CanAddMoreCarsMethod(SharedService service)
             {
-                s = service.carservice;
+                s = service.CarService;
             }
 
             [Fact]
