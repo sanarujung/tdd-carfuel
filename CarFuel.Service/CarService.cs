@@ -8,7 +8,7 @@ using CarFuel.Models;
 
 namespace CarFuel.Service
 {
-    public class CarService
+    public class CarService : ICarService
     {
         public ICarDb CarDb { get; }
 

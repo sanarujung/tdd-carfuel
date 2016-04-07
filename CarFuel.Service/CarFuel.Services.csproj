@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="BussinessException.cs" />
     <Compile Include="CarService.cs" />
+    <Compile Include="ICarService.cs" />
     <Compile Include="OverQuotaException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
