@@ -78,7 +78,7 @@ namespace CarFuel.Facts.Services
                 Assert.Equal(c2.Make, c.Make);
                 Assert.Equal(c2.Model, c.Model);
 
-                mock.Verify(db => db.Add(It.IsAny<Car>()), Times.Exactly(3));  // check ว่าตัว moq ที่ทำถูกเรียก 1 ครั้ง
+                mock.Verify(db => db.Add(It.IsAny<Car>()), Times.Once);  // check ว่าตัว moq ที่ทำถูกเรียก 1 ครั้ง
 
                 //Assert.True(db.AddMethodHasCalled);
                 //var cars = s.GetCarsByMember(userId);
