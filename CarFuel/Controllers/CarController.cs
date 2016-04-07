@@ -11,14 +11,12 @@ using Microsoft.AspNet.Identity;
 namespace CarFuel.Controllers
 {
     public class CarController : Controller
-    {
-        private ICarDb db;
-        private CarService carService;
+    {                       
+        private readonly ICarService carService;
 
-        public CarController()
+        public CarController(ICarService carservice)
         {
-            db = new CarDb();
-            carService = new CarService(db);
+            this.carService = carservice;
         }
 
         [Authorize]
